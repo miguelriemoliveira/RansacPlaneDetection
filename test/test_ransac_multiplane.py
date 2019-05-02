@@ -12,6 +12,7 @@ import seaborn as sns
 from mpl_toolkits.mplot3d import axes3d, Axes3D  # <-- Note the capitalization!
 from open3d import *
 
+
 class RansacIteration:
     def __init__(self, num_inliers, A, B, C, D):
         self.num_inliers = num_inliers
@@ -27,6 +28,7 @@ class RansacIteration:
     def __str__(self):
         return 'num_inliers= ' + str(self.num_inliers) + '\norg A=' + str(self.A) + ' B=' + str(self.B) + ' C=' + str(self.C) + ' D=' + str(self.D) + '\nref A=' + str(self.refA) + ' B=' + str(self.refB) + ' C=' + str(self.refC) + ' D=' + str(self.refD)
 
+
 def fitPlaneLTSQ(XYZ):
     (rows, cols) = XYZ.shape
     G = np.ones((rows, 3))
@@ -39,6 +41,7 @@ def fitPlaneLTSQ(XYZ):
     normal = normal / nn
     return (c, normal)
 
+
 def ransacPointSeparation(pts, niter, npoints, distance_threshold):
 
         selected = RansacIteration(0, 0, 0, 0, 0)
@@ -46,7 +49,7 @@ def ransacPointSeparation(pts, niter, npoints, distance_threshold):
         # Ransac iterations
         for i in range(0, niter):
 
-            # Randomly select three points that connot be cohincident
+            # Randomly select three points that connot be coincident
             # TODO missing check: the points also cannot be colinear
             idx1 = random.randint(0, npoints-1)
             while True:
@@ -96,10 +99,11 @@ def ransacPointSeparation(pts, niter, npoints, distance_threshold):
 
         return {'plane': selected, 'inliers': inliers, 'outliers': outliers}
 
+
 if __name__ == "__main__":
 
     # Load point cloud
-    p = read_point_cloud("/home/negativespade/datasets/meetingRoom5/00000015.ply")
+    p = read_point_cloud("/home/negativespade/datasets/meetingRoom5/00000050.ply")
     # draw_geometries([p])
 
     # Func args
