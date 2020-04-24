@@ -97,19 +97,30 @@ selected = RansacIteration(0, 0, 0, 0, 0)
 # Ransac iterations
 for i in range(0, number_iterations):
 
-    # Randomly select three points that connot be cohincident
-    # TODO missing check: the points also cannot be colinear
-    idx1 = random.randint(0, number_points)
+    # Randomly select three points that connot be cohincident 
+    # and colinear
     while True:
+        idx1 = random.randint(0, number_points)
         idx2 = random.randint(0, number_points)
-        if not idx2 == idx1:
-            break
-    while True:
         idx3 = random.randint(0, number_points)
-        if not idx3 == idx1 and not idx3 == idx2:
-            break
+        pt1, pt2, pt3 = pts[[idx1, idx2, idx3], :]
 
-    pt1, pt2, pt3 = pts[[idx1, idx2, idx3], :]
+        # Compute the norm of position vectors
+        ab = np.linalg.norm(pt2 - pt1)
+        bc = np.linalg.norm(pt3 - pt2)
+        ac = np.linalg.norm(pt3 - pt1)
+
+        # Check if points are colinear
+        if (ab + bc) == ac:
+            continue
+        # Check if are coincident
+        if idx2 == idx1:
+            continue
+        if idx3 == idx1 or idx3 == idx2:
+            continue
+
+        # If all the conditions are satisfied, we can end the loop
+        break
 
     # ABC Hessian coefficients and given by the external product between two vectors lying on hte plane
     A, B, C = np.cross(pt2 - pt1, pt3 - pt1)
