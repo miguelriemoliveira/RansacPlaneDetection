@@ -3,6 +3,7 @@
 Segments pointcloud into multiple planes, extracts their information and allows their visualisation
 """
 
+import os
 import collections
 import math
 import random
@@ -10,7 +11,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from mpl_toolkits.mplot3d import axes3d, Axes3D  # <-- Note the capitalization!
-from open3d import *
+# from open3d import *
+import open3d as o3d
 
 
 class RansacIteration:
@@ -103,8 +105,13 @@ def ransacPointSeparation(pts, niter, npoints, distance_threshold):
 if __name__ == "__main__":
 
     # Load point cloud
-    p = read_point_cloud("/home/negativespade/datasets/meetingRoom5/00000050.ply")
-    # draw_geometries([p])
+    pc_path = "/home/negativespade/datasets/meetingRoom5/00000050.ply"
+    if not os.path.isfile(pc_path):
+        print('[Err]: invalid point cloud file path.')
+        exit(-1)
+        
+    p = o3d.io.read_point_cloud(pc_path)
+    # o3d.visualization.draw_geometries([p])
 
     # Func args
     points = np.asarray(p.points)
@@ -145,9 +152,11 @@ if __name__ == "__main__":
         print('\nSelected plane: ' + str(result['plane']))
 
         # Visualization of segments
-        inlier_cloud = PointCloud()
+        inlier_cloud = o3d.geometry.PointCloud()
+        
         # Get the segment points
-        inlier_cloud.points = Vector3dVector(result['inliers'])
+        inlier_cloud.points = o3d.utility.Vector3dVector(result['inliers'])
+        
         # Paint them a different colour
         inlier_cloud.paint_uniform_color(current_palette[i])
         
@@ -155,8 +164,9 @@ if __name__ == "__main__":
         separated_clouds.append(inlier_cloud)
     
     p.paint_uniform_color([0, 0, 0])
+    
     # Show the original cloud
     separated_clouds.append(p)
 
     # Draw the clouds
-    draw_geometries(separated_clouds)
+    o3d.visualization.draw_geometries(separated_clouds)
